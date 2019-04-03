@@ -34,42 +34,35 @@ public class BillServlet extends HttpServlet {
     }
 
     private void displayBill(HttpServletRequest req, HttpServletResponse resp) {
-        Map<String,String> params = splitParameters(req.getQueryString());
-        Customer customer = new Customer(params.get("fullname"),params.get("address"));
+        Map<String, String> params = splitParameters(req.getQueryString());
+        Customer customer = new Customer(params.get("fullname"), params.get("address"));
         Delivery delivery = null;
-        switch (params.get("deliveryMode")){
-            case "direct" : {
+        switch (params.get("deliveryMode")) {
+            case "direct" :
                 delivery = new DirectDelivery();
                 break;
-            }
-            case "express" : {
+            case "express" :
                 delivery = new ExpressDelivery(params.get("deliveryInfo"));
                 break;
-            }
-            case "relay" : {
+            case "relay" :
                 delivery = new RelayDelivery(Integer.parseInt(params.get("deliveryInfo")));
                 break;
-            }
-            case "takeAway" : {
+            case "takeAway" :
                 delivery = new TakeAwayDelivery();
                 break;
-            }
-
         }
-        Bill bill = new Bill(customer,delivery);
+        Bill bill = new Bill(customer, delivery);
         String[] productsParams = params.get("products").split("%0D%0A");
-        for(String productLine : productsParams) {
+        for (String productLine : productsParams) {
             String[] productAndQuantity = productLine.split("%3A");
-            Product product = products.get(Integer.parseInt("productAndQuantity[0]"));
+            Product product = products.get(Integer.parseInt(productAndQuantity[0]));
             Integer quantity = Integer.parseInt(productAndQuantity[1]);
             bill.addProduct(product, quantity);
         }
         bill.generate(new Writer() {
             @Override
             public void start() {
-
             }
-
             @Override
             public void writeLine(String line) {
                 try {
@@ -78,13 +71,10 @@ public class BillServlet extends HttpServlet {
                     e.printStackTrace();
                 }
             }
-
             @Override
             public void stop() {
-
             }
         });
-
     }
 
 
